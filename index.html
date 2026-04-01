@@ -2,298 +2,290 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPL 2026 Infinity Edit Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Stalinist+One&family=Permanent+Marker&family=Monoton&family=Luckiest+Guy&family=Black+Ops+One&family=Righteous&family=Nosifer&family=Shojumaru&family=Press+Start+2P&family=Bungee+Shade&display=swap" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.3/dist/browser/bundle.umd.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IPL 2026 Studio - Gradient Master</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Stalinist+One&family=Permanent+Marker&family=Monoton&family=Luckiest+Guy&family=Righteous&family=Nosifer&family=Shojumaru&family=Press+Start+2P&family=Black+Ops+One&family=Creepster&family=Rubik+Glitch&family=Faster+One&family=Bungee+Shade&family=Fascinate&display=swap" rel="stylesheet">
     <style>
         :root { --accent: #f4a623; --surface: #12121a; }
-        body { font-family: 'Segoe UI', sans-serif; background: #050508; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        .app-card { background: var(--surface); padding: 25px; border-radius: 24px; width: 100%; max-width: 550px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
-        h2 { text-align: center; font-family: 'Bebas Neue', sans-serif; color: var(--accent); letter-spacing: 2px; margin: 0 0 20px 0; }
-        .mode-select { display: flex; gap: 10px; margin-bottom: 20px; }
-        .mode-btn { flex: 1; padding: 12px; background: #1e1e26; border-radius: 10px; cursor: pointer; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #333; transition: 0.2s; }
-        .mode-btn.active { background: var(--accent); color: black; border-color: var(--accent); }
-        .control-group { margin-bottom: 15px; }
-        label { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        select, button, input[type="file"] { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 14px; outline: none; box-sizing: border-box; }
-        select { background: #1a1a24; color: white; border: 1px solid #333; cursor: pointer; }
-        .upload-section { display: grid; grid-template-columns: 1fr; gap: 10px; }
         
-        /* Updated Input Styling */
-        input[type="file"] { background: #000; color: #888; font-size: 11px; border: 1px solid #333; transition: 0.3s; }
-        input[type="file"]:disabled { opacity: 0.5; cursor: not-allowed; }
-        input[type="file"].ready { border: 1px solid #00ff00; color: #00ff00; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: #000; color: white; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .preview-area {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 5px; background: radial-gradient(circle, #1a1a24 0%, #000 100%);
+            min-height: 0;
+        }
+
+        .canvas-wrapper {
+            height: 100%; aspect-ratio: 9/16; position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,1); border-radius: 6px;
+            overflow: hidden; border: 1px solid #222;
+        }
+
+        canvas { width: 100%; height: 100%; background: #000; touch-action: none; }
+
+        .editor-controls {
+            height: auto; width: 100%; background: var(--surface);
+            border-top: 1px solid #333; padding: 10px 15px; box-sizing: border-box; z-index: 100;
+        }
+
+        h2 { font-family: 'Bebas Neue', sans-serif; color: var(--accent); margin: 0 0 8px 0; font-size: 18px; text-align: center; }
+
+        .tab-row { display: flex; gap: 5px; margin-bottom: 8px; }
+        .tab { flex: 1; padding: 6px; background: #000; border-radius: 5px; cursor: pointer; text-align: center; font-size: 10px; font-weight: bold; border: 1px solid #333; }
+        .tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .span-2 { grid-column: span 2; }
+        label { display: block; font-size: 8px; color: #888; text-transform: uppercase; margin-bottom: 2px; font-weight: bold; }
+        select, input, button { width: 100%; padding: 7px; border-radius: 5px; border: none; font-size: 11px; outline: none; box-sizing: border-box; background: #08080c; color: white; border: 1px solid #222; }
         
-        .slider-wrap { background: #1a1a24; padding: 10px; border-radius: 10px; border: 1px solid #333; margin-top: 10px; }
-        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
-        .gen-btn { background: var(--accent); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 15px; font-size: 16px; box-shadow: 0 4px 15px rgba(244,166,35,0.3); }
-        .gen-btn:hover { background: white; transform: translateY(-2px); }
-        canvas { max-width: 100%; height: auto; border-radius: 15px; border: 2px solid #222; background: #000; margin-top: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); }
-        .status-text { font-size: 11px; color: var(--accent); margin-top: 10px; font-family: monospace; text-align: center; }
-        #aiStatus { display: block; color: #f4a623; font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold; background: #1e1e26; padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        input[type="color"] { padding: 2px; height: 30px; cursor: pointer; }
+        
+        .btn-main { background: var(--accent); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; }
+        .btn-sub { background: #222; color: white; font-size: 9px; cursor: pointer; }
+
+        .hint { font-size: 8px; color: #444; text-align: center; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <h2>IPL 2026 INFINITY EDIT</h2>
-    <div class="mode-select">
-        <div class="mode-btn active" id="btn3Layer" onclick="setMode('sandwich')">Sandwich Mode</div>
-        <div class="mode-btn" id="btn2Layer" onclick="setMode('poster')">Poster Mode</div>
-    </div>
-    
-    <div class="control-group">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><label>Team</label><select id="teamSelect" onchange="updateSquad()"></select></div>
-            <div><label>Player</label><select id="playerSelect"></select></div>
+    <div class="preview-area">
+        <div class="canvas-wrapper">
+            <canvas id="mainCanvas"></canvas>
         </div>
     </div>
-    
-    <div class="control-group">
-        <div class="upload-section" id="uploadPanel">
-            <div id="bgInputWrap">
-                <label>Upload Player Image (AI will extract automatically)</label>
-                <input type="file" id="imageLoader" accept="image/*" disabled>
-            </div>
-        </div>
-        <div id="aiStatus">⏳ Downloading AI Engine... Please wait...</div>
-    </div>
-    
-    <div class="slider-wrap"><label style="margin:0; color:var(--accent)">Vertical Position Offset</label><input type="range" id="yPosSlider" min="200" max="1600" value="750"></div>
-    <button class="gen-btn" onclick="render()">GENERATE RANDOM COMBO</button>
-</div>
 
-<div class="status-text" id="log">Ready to edit...</div>
-<canvas id="mainCanvas"></canvas>
+    <div class="editor-controls">
+        <div class="tab-row">
+            <div class="tab active" id="tabSandwich" onclick="setMode('sandwich')">SANDWICH</div>
+            <div class="tab" id="tabPoster" onclick="setMode('poster')">POSTER</div>
+        </div>
+
+        <div class="form-grid">
+            <div class="span-2"><label>Team / Player</label>
+                <div style="display:flex; gap:5px;">
+                    <select id="teamSelect" onchange="updateSquad()"></select>
+                    <select id="playerSelect" onchange="updateContent()"></select>
+                </div>
+            </div>
+            <div><label>Text Color</label><input type="color" id="textColor" value="#ffffff" oninput="render()"></div>
+        </div>
+
+        <div class="form-grid">
+            <div class="span-2"><label>Custom Text</label><input type="text" id="customText" placeholder="GOAT" oninput="updateContent()"></div>
+            <div><label>BG Start</label><input type="color" id="gradStart" value="#f4a623" oninput="render()"></div>
+        </div>
+
+        <div class="form-grid">
+            <div class="span-2" id="bgField"><label>1. BG Photo</label><input type="file" id="bgLoader"></div>
+            <div class="span-2" id="posterActions" style="display:none;"><button class="btn-sub" onclick="randomizeColors()">Random Gradient</button></div>
+            <div><label>BG End</label><input type="color" id="gradEnd" value="#000000" oninput="render()"></div>
+        </div>
+
+        <div class="form-grid">
+            <div class="span-2"><label id="cutoutLabel">2. Cutout</label><input type="file" id="cutoutLoader"></div>
+            <button class="btn-main" onclick="randomizeStyle()">Font</button>
+        </div>
+        
+        <div class="hint">Drag to move | Corners to resize | Top to rotate</div>
+    </div>
 
 <script>
     const SQUADS = {
-        csk:{"Ruturaj Gaikwad":31,"MS Dhoni":7,"Sanju Samson":8,"Shivam Dube":54,"Noor Ahmad":15,"Ayush Mhatre":96,"Kartik Sharma":12,"Sarfaraz Khan":13},
-        mi:{"Rohit Sharma":45,"Hardik Pandya":228,"Surya Kumar Yadav":63,"Jasprit Bumrah":93,"Trent Boult":19,"Quinton de Kock":25},
-        rcb:{"Virat Kohli":18,"Rajat Patidar":1,"Phil Salt":28,"Bhuvneshwar Kumar":15,"Josh Hazlewood":38,"Venkatesh Iyer":19},
-        dc:{"KL Rahul":1,"Axar Patel":20,"Mitchell Starc":56,"Kuldeep Yadav":23,"Prithvi Shaw":201},
-        gt:{"Shubman Gill":77,"Jos Buttler":63,"Rashid Khan":19,"Mohammed Siraj":21},
-        kkr:{"Ajinkya Rahane":27,"Rinku Singh":12,"Cameron Green":51,"Rachin Ravindra":3,"Sunil Narine":11},
-        lsg:{"Rishabh Pant":17,"Nicholas Pooran":24,"Wanindu Hasaranga":4,"Mayank Yadav":88},
-        rr:{"Riyan Parag":9,"Yashasvi Jaiswal":4,"Ravindra Jadeja":8,"Jofra Archer":22},
-        pbks:{"Shreyas Iyer":41,"Arshdeep Singh":2,"Yuzvendra Chahal":3},
-        srh:{"Pat Cummins":30,"Travis Head":35,"Abhishek Sharma":7,"Heinrich Klaasen":24}
+        csk:{"MS Dhoni":7,"Ruturaj Gaikwad":31,"Sanju Samson":16,"Shivam Dube":54},
+        mi:{"Rohit Sharma":45,"Hardik Pandya":228,"Surya Kumar Yadav":63,"Jasprit Bumrah":93},
+        rcb:{"Virat Kohli":18,"Rajat Patidar":1,"Phil Salt":28,"Devdutt Padikkal":10},
+        dc:{"Axar Patel":20,"KL Rahul":1,"Kuldeep Yadav":16,"Mitchell Starc":56},
+        gt:{"Shubman Gill":77,"Sai Sudharsan":41,"Jos Buttler":63,"Rashid Khan":19},
+        srh:{"Pat Cummins":30,"Travis Head":35,"Heinrich Klaasen":24,"Abhishek Sharma":7}
     };
+    const FONTS = ['Impact', 'Bebas Neue', 'Russo One', 'Stalinist One', 'Permanent Marker', 'Monoton', 'Righteous', 'Nosifer', 'Shojumaru', 'Press Start 2P', 'Bungee Shade', 'Faster One', 'Rubik Glitch'];
+    const TEAM_COLORS = { csk: '#f5c518', mi: '#004b8d', rcb: '#c41e3a', dc: '#1a5dd9', gt: '#1b2133', srh: '#f26522' };
 
-    const TEAM_HUES = { csk: 48, dc: 215, gt: 210, kkr: 280, lsg: 195, mi: 210, pbks: 350, rr: 330, rcb: 0, srh: 25 };
-    const FONTS = ['Impact', 'Bebas Neue', 'Russo One', 'Stalinist One', 'Permanent Marker', 'Monoton', 'Righteous', 'Luckiest Guy', 'Black Ops One', 'Nosifer', 'Shojumaru', 'Press Start 2P', 'Bungee Shade'];
-    const EFFECTS = ['GLITCH', 'NEON', '3D_STACK', 'OUTLINE', 'CHROME', 'INNER_SHADOW'];
-    
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = 1080; canvas.height = 1920;
-    
-    let imgBG = null;
-    let imgCutout = null;
-    let currentMode = 'sandwich';
 
-    function init() {
-        const teamSelect = document.getElementById('teamSelect');
-        for (let t in SQUADS) {
-            let opt = document.createElement("option");
-            opt.value = t; opt.innerText = t.toUpperCase();
-            teamSelect.appendChild(opt);
-        }
+    let imgBG = null, imgCutout = null, currentFont = 'Impact', currentMode = 'sandwich';
+
+    let items = [
+        { id: 'num', text: '7', x: 540, y: 700, size: 700, rotation: 0, w: 0, h: 0 },
+        { id: 'txt', text: '', x: 540, y: 1150, size: 180, rotation: 0, w: 0, h: 0 }
+    ];
+
+    let selectedItem = null, dragMode = null;
+    let startMouseAngle = 0, initialRotation = 0, startDist = 0, startSize = 0, dragOffset = {x:0, y:0};
+
+    (function init() {
+        const ts = document.getElementById('teamSelect');
+        for (let t in SQUADS) ts.add(new Option(t.toUpperCase(), t));
         updateSquad();
-        setupImageLoader();
-        startAIChecker(); // Start the background polling
-    }
+        setupLoaders();
+        setupInteraction();
+        render();
+    })();
 
     function updateSquad() {
         const team = document.getElementById('teamSelect').value;
-        const playerSelect = document.getElementById('playerSelect');
-        playerSelect.innerHTML = "";
-        for (let name in SQUADS[team]) {
-            let opt = document.createElement("option");
-            opt.value = SQUADS[team][name];
-            opt.innerText = `${name} (${SQUADS[team][name]})`;
-            playerSelect.appendChild(opt);
-        }
+        document.getElementById('gradStart').value = TEAM_COLORS[team] || '#1a1a24';
+        const ps = document.getElementById('playerSelect');
+        ps.innerHTML = "";
+        for (let n in SQUADS[team]) ps.add(new Option(`${n} (${SQUADS[team][n]})`, SQUADS[team][n]));
+        updateContent();
+    }
+
+    function updateContent() {
+        items[0].text = document.getElementById('playerSelect').value;
+        items[1].text = document.getElementById('customText').value;
+        render();
     }
 
     function setMode(mode) {
         currentMode = mode;
-        document.getElementById('btn3Layer').classList.toggle('active', mode === 'sandwich');
-        document.getElementById('btn2Layer').classList.toggle('active', mode === 'poster');
+        document.getElementById('tabSandwich').classList.toggle('active', mode === 'sandwich');
+        document.getElementById('tabPoster').classList.toggle('active', mode === 'poster');
+        document.getElementById('bgField').style.display = mode === 'sandwich' ? 'block' : 'none';
+        document.getElementById('posterActions').style.display = mode === 'poster' ? 'block' : 'none';
         render();
     }
 
-    // SMART LOCK MECHANISM
-    function startAIChecker() {
-        const imageLoader = document.getElementById('imageLoader');
-        const aiStatus = document.getElementById('aiStatus');
-        
-        let retryCount = 0;
-        let aiCheck = setInterval(() => {
-            retryCount++;
-            
-            // Check if the AI library has successfully attached to the browser
-            if (typeof imglyRemoveBackground !== 'undefined') {
-                clearInterval(aiCheck);
-                imageLoader.disabled = false;
-                imageLoader.classList.add('ready');
-                aiStatus.innerText = '✅ AI Ready! You can now choose a file.';
-                aiStatus.style.color = '#00ff00';
-                setTimeout(() => aiStatus.style.display = 'none', 4000);
-            } 
-            // If it takes more than 20 seconds, it's definitely blocked
-            else if (retryCount > 20) {
-                clearInterval(aiCheck);
-                aiStatus.innerText = '❌ AI blocked by browser. Turn off ad-blockers and refresh.';
-                aiStatus.style.color = 'red';
-            }
-        }, 1000); // Check every 1 second
+    function randomizeColors() {
+        const r = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        document.getElementById('gradStart').value = r();
+        document.getElementById('gradEnd').value = '#000000';
+        render();
     }
 
-    function setupImageLoader() {
-        document.getElementById('imageLoader').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+    function randomizeStyle() {
+        currentFont = FONTS[Math.floor(Math.random() * FONTS.length)];
+        render();
+    }
 
-            const bgUrl = URL.createObjectURL(file);
-            const img = new Image();
-            img.onload = () => { 
-                imgBG = img; 
-                render(); 
+    function setupLoaders() {
+        const load = (id, cb) => document.getElementById(id).onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { 
+                const img = new Image(); 
+                img.onload = () => { cb(img); render(); }; 
+                img.src = ev.target.result; 
             };
-            img.src = bgUrl;
+            reader.readAsDataURL(e.target.files[0]);
+        };
+        load('bgLoader', (img) => imgBG = img);
+        load('cutoutLoader', (img) => imgCutout = img);
+    }
 
-            const aiStatus = document.getElementById('aiStatus');
-            aiStatus.style.display = 'block';
-            aiStatus.style.color = '#00ffff';
-            aiStatus.innerText = '🤖 Extracting Player... Please wait...';
+    function getMouse(e) {
+        const r = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (clientX - r.left) * (1080 / r.width), y: (clientY - r.top) * (1920 / r.height) };
+    }
 
-            const config = {
-                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.3/dist/"
-            };
-
-            try {
-                const imageBlob = await imglyRemoveBackground(file, config);
-                const cutoutUrl = URL.createObjectURL(imageBlob);
-                
-                const cutout = new Image();
-                cutout.onload = () => { 
-                    imgCutout = cutout; 
-                    aiStatus.innerText = '✅ Player extracted successfully!';
-                    aiStatus.style.color = '#00ff00';
-                    setTimeout(() => aiStatus.style.display = 'none', 3000);
-                    render(); 
-                };
-                cutout.src = cutoutUrl;
-                
-            } catch (error) {
-                console.error("AI Error:", error);
-                const errorMessage = error.message || error.toString();
-                aiStatus.innerText = `❌ Error: ${errorMessage}`;
-                aiStatus.style.color = 'red';
+    function setupInteraction() {
+        const start = (e) => {
+            const pos = getMouse(e);
+            for (let item of [...items].reverse()) {
+                if (!item.text && item.id === 'txt') continue;
+                const rx = item.x + Math.sin(item.rotation) * -(item.h/2 + 120);
+                const ry = item.y - Math.cos(item.rotation) * (item.h/2 + 120);
+                if (Math.hypot(pos.x - rx, pos.y - ry) < 80) {
+                    selectedItem = item; dragMode = 'rotate';
+                    startMouseAngle = Math.atan2(pos.y - item.y, pos.x - item.x);
+                    initialRotation = item.rotation; return;
+                }
+                const resX = item.x + (item.w/2 * Math.cos(item.rotation)) - (item.h/2 * Math.sin(item.rotation));
+                const resY = item.y + (item.w/2 * Math.sin(item.rotation)) + (item.h/2 * Math.cos(item.rotation));
+                if (Math.hypot(pos.x - resX, pos.y - resY) < 80) {
+                    selectedItem = item; dragMode = 'resize';
+                    startDist = Math.hypot(pos.x - item.x, pos.y - item.y);
+                    startSize = item.size; return;
+                }
+                const dx = pos.x - item.x, dy = pos.y - item.y;
+                const hx = dx * Math.cos(-item.rotation) - dy * Math.sin(-item.rotation);
+                const hy = dx * Math.sin(-item.rotation) + dy * Math.cos(-item.rotation);
+                if (Math.abs(hx) < item.w/2 + 40 && Math.abs(hy) < item.h/2 + 40) {
+                    selectedItem = item; dragMode = 'move';
+                    dragOffset = { x: dx, y: dy }; render(); return;
+                }
             }
-        });
+            selectedItem = null; render();
+        };
+        const move = (e) => {
+            if (!selectedItem || !dragMode) return;
+            const pos = getMouse(e);
+            if (dragMode === 'move') { selectedItem.x = pos.x - dragOffset.x; selectedItem.y = pos.y - dragOffset.y; }
+            else if (dragMode === 'rotate') { 
+                selectedItem.rotation = initialRotation + (Math.atan2(pos.y - selectedItem.y, pos.x - selectedItem.x) - startMouseAngle);
+            } else if (dragMode === 'resize') {
+                selectedItem.size = Math.max(50, (Math.hypot(pos.x - selectedItem.x, pos.y - selectedItem.y) / startDist) * startSize);
+            }
+            render();
+        };
+        canvas.addEventListener('mousedown', start);
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', () => dragMode = null);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); }, {passive:false});
+        window.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); }, {passive:false});
+        window.addEventListener('touchend', () => dragMode = null);
     }
 
     function render() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const team = document.getElementById('teamSelect').value;
-        const hue = Math.floor(Math.random() * 360); 
-        const font = FONTS[Math.floor(Math.random() * FONTS.length)];
-        const effect = EFFECTS[Math.floor(Math.random() * EFFECTS.length)];
-        const num = document.getElementById('playerSelect').value;
-        const yOffset = parseInt(document.getElementById('yPosSlider').value);
+        ctx.clearRect(0, 0, 1080, 1920);
+        const c1 = document.getElementById('gradStart').value;
+        const c2 = document.getElementById('gradEnd').value;
 
-        document.getElementById('log').innerText = `Color Hue: ${hue} | Font: ${font} | Style: ${effect}`;
+        // 1. BG LAYER
+        const g = ctx.createLinearGradient(0, 0, 0, 1920);
+        g.addColorStop(0, c1);
+        g.addColorStop(1, c2);
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 1080, 1920);
 
         if (currentMode === 'sandwich' && imgBG) {
-            drawFit(imgBG);
+            const r = Math.max(1080/imgBG.width, 1920/imgBG.height);
             ctx.save();
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.fillStyle = `hsla(${hue}, 70%, 50%, 0.4)`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 0.6; // Allows gradient tinting to show through
+            ctx.drawImage(imgBG, (1080 - imgBG.width*r)/2, (1920 - imgBG.height*r)/2, imgBG.width*r, imgBG.height*r);
             ctx.restore();
-            
-            ctx.save();
-            ctx.globalCompositeOperation = 'overlay';
-            ctx.fillStyle = `hsla(${hue}, 80%, 40%, 0.3)`;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.restore();
-        } else {
-            drawPosterBG(hue);
         }
 
-        drawComplexText(num, font, hue, yOffset, effect);
+        // 2. TEXT LAYERS
+        const color = document.getElementById('textColor').value;
+        items.forEach(item => {
+            if (!item.text && item.id === 'txt') return;
+            ctx.save(); ctx.translate(item.x, item.y); ctx.rotate(item.rotation);
+            ctx.font = `bold ${item.size}px "${currentFont}"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            const m = ctx.measureText(item.text); item.w = m.width; item.h = item.size * 0.8;
+            ctx.shadowBlur = 40; ctx.shadowColor = "rgba(0,0,0,0.8)";
+            ctx.fillStyle = color; ctx.fillText(item.text, 0, 0);
+            if (selectedItem === item) {
+                ctx.strokeStyle = '#f4a623'; ctx.lineWidth = 6; ctx.setLineDash([20, 15]);
+                ctx.strokeRect(-item.w/2 - 30, -item.h/2 - 30, item.w + 60, item.h + 60);
+                ctx.setLineDash([]);
+                ctx.fillStyle = "#f4a623"; ctx.beginPath(); ctx.arc(0, -item.h/2 - 120, 35, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "white"; ctx.lineWidth = 5; ctx.stroke();
+                ctx.fillStyle = "white"; ctx.fillRect(item.w/2 + 20, item.h/2 + 20, 50, 50);
+            }
+            ctx.restore();
+        });
 
+        // 3. CUTOUT LAYER (TOP)
         if (imgCutout) {
-            drawFit(imgCutout);
+            const r = 1080 / imgCutout.width;
+            ctx.drawImage(imgCutout, 0, 1920 - (imgCutout.height*r), 1080, imgCutout.height*r);
         }
 
-        addCinematicOverlay();
-    }
-
-    function drawFit(img) {
-        const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
-        const w = img.width * ratio; const h = img.height * ratio;
-        ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
-    }
-
-    function drawPosterBG(hue) {
-        const g = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        g.addColorStop(0, `hsl(${hue}, 80%, 20%)`);
-        g.addColorStop(1, '#000');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.1)`;
-        for(let i=0; i<3; i++) {
-            ctx.beginPath();
-            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 600, 0, Math.PI*2);
-            ctx.fill();
-        }
-    }
-
-    function drawComplexText(text, font, hue, y, effect) {
-        ctx.save();
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = `bold 950px "${font}"`;
-        if (['Monoton', 'Nosifer', 'Press Start 2P', 'Bungee Shade'].includes(font)) ctx.font = `bold 600px "${font}"`;
-        
-        const x = canvas.width / 2;
-        if (effect === 'GLITCH') {
-            ctx.fillStyle = "#ff0080"; ctx.fillText(text, x - 15, y);
-            ctx.fillStyle = "#00ffff"; ctx.fillText(text, x + 15, y);
-            ctx.fillStyle = "white"; ctx.fillText(text, x, y);
-        } else if (effect === 'NEON') {
-            ctx.shadowBlur = 80; ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
-            ctx.strokeStyle = "white"; ctx.lineWidth = 20; ctx.strokeText(text, x, y);
-            ctx.fillStyle = "rgba(255,255,255,0.1)"; ctx.fillText(text, x, y);
-        } else if (effect === 'CHROME') {
-            const grd = ctx.createLinearGradient(0, y-400, 0, y+400);
-            grd.addColorStop(0, "#fff"); grd.addColorStop(0.5, "#888"); grd.addColorStop(1, "#333");
-            ctx.fillStyle = grd; ctx.fillText(text, x, y);
-        } else {
-            ctx.fillStyle = "white"; ctx.fillText(text, x, y);
-        }
-        ctx.restore();
-    }
-
-    function addCinematicOverlay() {
-        ctx.fillStyle = "rgba(255,255,255,0.03)";
-        for(let i=0; i<800; i++) { ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 2, 2); }
-        
         const v = ctx.createRadialGradient(540, 960, 200, 540, 960, 1600);
         v.addColorStop(0, "transparent"); v.addColorStop(1, "rgba(0,0,0,0.85)");
-        ctx.fillStyle = v; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = v; ctx.fillRect(0,0,1080,1920);
     }
-    
-    document.getElementById('yPosSlider').addEventListener('input', render);
-
-    init();
-
+    window.onload = init;
 </script>
 </body>
 </html>
