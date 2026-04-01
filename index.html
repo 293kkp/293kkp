@@ -3,250 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neomorphic Wall Clock</title>
+    <title>IPL 2026 Infinity Edit Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Stalinist+One&family=Permanent+Marker&family=Monoton&family=Luckiest+Guy&family=Black+Ops+One&family=Righteous&family=Nosifer&family=Shojumaru&family=Press+Start+2P&family=Bungee+Shade&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/bundle.umd.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            /* ब्राउन बैकग्राउंड */
-            background-color: #8D5524; 
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* नियोमॉर्फिक फुलस्क्रीन बटन */
-        #fullscreen-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: #8D5524;
-            color: #f0f0f0;
-            border: none;
-            border-radius: 12px;
-            /* ब्राउन बैकग्राउंड पर नियोमॉर्फिक 3D शैडो */
-            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), 
-                       -6px -6px 12px rgba(255, 255, 255, 0.1);
-            z-index: 100;
-            transition: all 0.2s ease;
-        }
-
-        #fullscreen-btn:active {
-            /* क्लिक करने पर अंदर की तरफ दबने का इफ़ेक्ट */
-            box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.4), 
-                        inset -4px -4px 8px rgba(255, 255, 255, 0.1);
-        }
-
-        /* ग्रीन आउटर रिंग (नियोमॉर्फिक इफ़ेक्ट के साथ) */
-        .clock-ring {
-            width: 85vmin;
-            height: 85vmin;
-            background-color: #4CAF50; /* ग्रीन */
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* बाहर की तरफ उभरा हुआ 3D इफ़ेक्ट */
-            box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.5), 
-                       -15px -15px 30px rgba(255, 255, 255, 0.1);
-        }
-
-        /* स्काई-ब्लू इनर क्लॉक (अंदर की तरफ धंसा हुआ इफ़ेक्ट) */
-        .clock-inner {
-            width: 76vmin;
-            height: 76vmin;
-            background-color: #87CEEB; /* स्काई-ब्लू */
-            border-radius: 50%;
-            position: relative;
-            /* अंदर की तरफ गहराई (Inset shadow) */
-            box-shadow: inset 12px 12px 24px rgba(0, 0, 0, 0.25), 
-                        inset -12px -12px 24px rgba(255, 255, 255, 0.4);
-        }
-
-        /* घड़ी के बीच का 3D बिंदु */
-        .clock-inner::after {
-            content: '';
-            position: absolute;
-            width: 4vmin;
-            height: 4vmin;
-            background-color: #87CEEB;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.3), 
-                       -3px -3px 6px rgba(255,255,255,0.5);
-        }
-
-        /* 1 से 12 तक के नंबरों का डिज़ाइन */
-        .number {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            font-size: 5vmin;
-            font-weight: 700;
-            color: #333;
-            /* नंबरों को भी हल्का 3D लुक देने के लिए टेक्स्ट शैडो */
-            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6), 
-                        -1px -1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .number div {
-            padding-top: 3vmin;
-        }
-
-        /* कांटों की सामान्य स्टाइलिंग (परछाई के साथ ताकि वे तैरते हुए दिखें) */
-        .hand {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            transform-origin: bottom center;
-            border-radius: 10px;
-            z-index: 5;
-            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        /* घंटे का कांटा */
-        .hour {
-            width: 2.5vmin;
-            height: 20vmin;
-            background-color: #2c3e50; 
-            margin-left: -1.25vmin;
-        }
-
-        /* मिनट का कांटा */
-        .minute {
-            width: 1.5vmin;
-            height: 28vmin;
-            background-color: #8e44ad; 
-            margin-left: -0.75vmin;
-        }
-
-        /* सेकंड का कांटा */
-        .second {
-            width: 0.6vmin;
-            height: 33vmin;
-            background-color: #e74c3c; 
-            margin-left: -0.3vmin;
-            z-index: 6;
-        }
-
-        /* छोटा फॉन्ट: दिन और तारीख का नियोमॉर्फिक बॉक्स */
-        .date-display {
-            position: absolute;
-            top: 65%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background-color: #87CEEB;
-            padding: 1vmin 2.5vmin;
-            border-radius: 15px;
-            font-size: 2vmin; /* Small font size */
-            font-weight: 600;
-            color: #444;
-            /* बॉक्स को हल्का सा ऊपर उठाने वाला इफ़ेक्ट */
-            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15), 
-                       -4px -4px 8px rgba(255, 255, 255, 0.4);
-            white-space: nowrap;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
+        :root { --accent: #f4a623; --surface: #12121a; }
+        body { font-family: 'Segoe UI', sans-serif; background: #050508; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        .app-card { background: var(--surface); padding: 25px; border-radius: 24px; width: 100%; max-width: 550px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        h2 { text-align: center; font-family: 'Bebas Neue', sans-serif; color: var(--accent); letter-spacing: 2px; margin: 0 0 20px 0; }
+        .mode-select { display: flex; gap: 10px; margin-bottom: 20px; }
+        .mode-btn { flex: 1; padding: 12px; background: #1e1e26; border-radius: 10px; cursor: pointer; text-align: center; font-size: 13px; font-weight: bold; border: 1px solid #333; transition: 0.2s; }
+        .mode-btn.active { background: var(--accent); color: black; border-color: var(--accent); }
+        .control-group { margin-bottom: 15px; }
+        label { display: block; font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        select, button, input[type="file"] { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 14px; outline: none; box-sizing: border-box; }
+        select { background: #1a1a24; color: white; border: 1px solid #333; cursor: pointer; }
+        .upload-section { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        input[type="file"] { background: #000; color: #888; font-size: 11px; border: 1px solid #333; }
+        .slider-wrap { background: #1a1a24; padding: 10px; border-radius: 10px; border: 1px solid #333; margin-top: 10px; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
+        .gen-btn { background: var(--accent); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 15px; font-size: 16px; box-shadow: 0 4px 15px rgba(244,166,35,0.3); }
+        .gen-btn:hover { background: white; transform: translateY(-2px); }
+        canvas { max-width: 100%; height: auto; border-radius: 15px; border: 2px solid #222; background: #000; margin-top: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); }
+        .status-text { font-size: 11px; color: var(--accent); margin-top: 10px; font-family: monospace; text-align: center; }
+        #aiStatus { display: none; color: #00ffff; font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold; background: #1e1e26; padding: 10px; border-radius: 8px; border: 1px solid #333; }
     </style>
 </head>
 <body>
 
-    <button id="fullscreen-btn">Toggle Fullscreen</button>
-
-    <div class="clock-ring">
-        <div class="clock-inner" id="clock">
-            <div id="date-display" class="date-display"></div>
-            
-            <div class="hand hour" id="hour"></div>
-            <div class="hand minute" id="minute"></div>
-            <div class="hand second" id="second"></div>
+<div class="app-card">
+    <h2>IPL 2026 INFINITY EDIT</h2>
+    <div class="mode-select">
+        <div class="mode-btn active" id="btn3Layer" onclick="setMode('sandwich')">Sandwich Mode</div>
+        <div class="mode-btn" id="btn2Layer" onclick="setMode('poster')">Poster Mode</div>
+    </div>
+    
+    <div class="control-group">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div><label>Team</label><select id="teamSelect" onchange="updateSquad()"></select></div>
+            <div><label>Player</label><select id="playerSelect"></select></div>
         </div>
     </div>
+    
+    <div class="control-group">
+        <div class="upload-section" id="uploadPanel">
+            <div id="bgInputWrap">
+                <label>Upload Player Image (AI will extract automatically)</label>
+                <input type="file" id="imageLoader" accept="image/*">
+            </div>
+        </div>
+        <div id="aiStatus">🤖 AI is cutting out the player... Please wait...</div>
+    </div>
+    
+    <div class="slider-wrap"><label style="margin:0; color:var(--accent)">Vertical Position Offset</label><input type="range" id="yPosSlider" min="200" max="1600" value="750"></div>
+    <button class="gen-btn" onclick="render()">GENERATE RANDOM COMBO</button>
+</div>
 
-    <script>
-        // 1. घड़ी में 1 से 12 तक के नंबर सेट करना
-        const clockInner = document.getElementById('clock');
-        for (let i = 1; i <= 12; i++) {
-            let numContainer = document.createElement('div');
-            numContainer.className = 'number';
-            numContainer.style.transform = `rotate(${i * 30}deg)`; 
-            
-            let numText = document.createElement('div');
-            numText.innerText = i;
-            // नंबरों को सीधा रखने के लिए वापस उल्टा घुमाना
-            numText.style.transform = `rotate(-${i * 30}deg)`; 
+<div class="status-text" id="log">Ready to edit...</div>
+<canvas id="mainCanvas"></canvas>
 
-            numContainer.appendChild(numText);
-            clockInner.appendChild(numContainer);
+<script>
+    const SQUADS = {
+        csk:{"Ruturaj Gaikwad":31,"MS Dhoni":7,"Sanju Samson":8,"Shivam Dube":54,"Noor Ahmad":15,"Ayush Mhatre":96,"Kartik Sharma":12,"Sarfaraz Khan":13},
+        mi:{"Rohit Sharma":45,"Hardik Pandya":228,"Surya Kumar Yadav":63,"Jasprit Bumrah":93,"Trent Boult":19,"Quinton de Kock":25},
+        rcb:{"Virat Kohli":18,"Rajat Patidar":1,"Phil Salt":28,"Bhuvneshwar Kumar":15,"Josh Hazlewood":38,"Venkatesh Iyer":19},
+        dc:{"KL Rahul":1,"Axar Patel":20,"Mitchell Starc":56,"Kuldeep Yadav":23,"Prithvi Shaw":201},
+        gt:{"Shubman Gill":77,"Jos Buttler":63,"Rashid Khan":19,"Mohammed Siraj":21},
+        kkr:{"Ajinkya Rahane":27,"Rinku Singh":12,"Cameron Green":51,"Rachin Ravindra":3,"Sunil Narine":11},
+        lsg:{"Rishabh Pant":17,"Nicholas Pooran":24,"Wanindu Hasaranga":4,"Mayank Yadav":88},
+        rr:{"Riyan Parag":9,"Yashasvi Jaiswal":4,"Ravindra Jadeja":8,"Jofra Archer":22},
+        pbks:{"Shreyas Iyer":41,"Arshdeep Singh":2,"Yuzvendra Chahal":3},
+        srh:{"Pat Cummins":30,"Travis Head":35,"Abhishek Sharma":7,"Heinrich Klaasen":24}
+    };
+
+    const TEAM_HUES = { csk: 48, dc: 215, gt: 210, kkr: 280, lsg: 195, mi: 210, pbks: 350, rr: 330, rcb: 0, srh: 25 };
+    const FONTS = ['Impact', 'Bebas Neue', 'Russo One', 'Stalinist One', 'Permanent Marker', 'Monoton', 'Righteous', 'Luckiest Guy', 'Black Ops One', 'Nosifer', 'Shojumaru', 'Press Start 2P', 'Bungee Shade'];
+    const EFFECTS = ['GLITCH', 'NEON', '3D_STACK', 'OUTLINE', 'CHROME', 'INNER_SHADOW'];
+    
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 1080; canvas.height = 1920;
+    
+    let imgBG = null;
+    let imgCutout = null;
+    let currentMode = 'sandwich';
+
+    (function init() {
+        const teamSelect = document.getElementById('teamSelect');
+        for (let t in SQUADS) {
+            let opt = document.createElement("option");
+            opt.value = t; opt.innerText = t.toUpperCase();
+            teamSelect.appendChild(opt);
         }
+        updateSquad();
+        setupImageLoader();
+    })();
 
-        // 2. घड़ी के कांटे और तारीख का लॉजिक
-        const hourHand = document.getElementById('hour');
-        const minuteHand = document.getElementById('minute');
-        const secondHand = document.getElementById('second');
-        const dateDisplay = document.getElementById('date-display');
-
-        function setClock() {
-            const currentDate = new Date();
-            
-            const secondsRatio = currentDate.getSeconds() / 60;
-            const minutesRatio = (secondsRatio + currentDate.getMinutes()) / 60;
-            const hoursRatio = (minutesRatio + currentDate.getHours()) / 12;
-
-            setRotation(secondHand, secondsRatio);
-            setRotation(minuteHand, minutesRatio);
-            setRotation(hourHand, hoursRatio);
-
-            // दिन और तारीख अंग्रेजी में (Small format)
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
-            dateDisplay.innerText = currentDate.toLocaleDateString('en-US', options);
+    function updateSquad() {
+        const team = document.getElementById('teamSelect').value;
+        const playerSelect = document.getElementById('playerSelect');
+        playerSelect.innerHTML = "";
+        for (let name in SQUADS[team]) {
+            let opt = document.createElement("option");
+            opt.value = SQUADS[team][name];
+            opt.innerText = `${name} (${SQUADS[team][name]})`;
+            playerSelect.appendChild(opt);
         }
+    }
 
-        function setRotation(element, rotationRatio) {
-            element.style.transform = `rotate(${rotationRatio * 360}deg)`;
-        }
+    function setMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn3Layer').classList.toggle('active', mode === 'sandwich');
+        document.getElementById('btn2Layer').classList.toggle('active', mode === 'poster');
+        render();
+    }
 
-        setInterval(setClock, 1000);
-        setClock();
+    function setupImageLoader() {
+        document.getElementById('imageLoader').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        // 3. फुलस्क्रीन बटन का लॉजिक
-        const fullscreenBtn = document.getElementById('fullscreen-btn');
+            // 1. Immediately load original image as the background
+            const bgUrl = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => { 
+                imgBG = img; 
+                render(); // Show the background right away
+            };
+            img.src = bgUrl;
 
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
+            // 2. Setup UI for AI processing
+            const aiStatus = document.getElementById('aiStatus');
+            aiStatus.style.display = 'block';
+            aiStatus.style.color = '#00ffff';
+            aiStatus.innerText = '⏳ Downloading AI Model & processing... Please wait...';
+
+            // 3. Configure public path to bypass mobile file restrictions
+            const config = {
+                publicPath: "https://unpkg.com/@imgly/background-removal@1.4.3/dist/"
+            };
+
+            try {
+                // 4. Run the AI Extractor
+                const imageBlob = await imglyRemoveBackground(file, config);
+                const cutoutUrl = URL.createObjectURL(imageBlob);
+                
+                // 5. Load the new transparent cutout as the top layer
+                const cutout = new Image();
+                cutout.onload = () => { 
+                    imgCutout = cutout; 
+                    aiStatus.innerText = '✅ Player extracted successfully!';
+                    aiStatus.style.color = '#00ff00';
+                    setTimeout(() => aiStatus.style.display = 'none', 3000);
+                    render(); // Re-render to show the final text sandwich
+                };
+                cutout.src = cutoutUrl;
+                
+            } catch (error) {
+                console.error("AI Error:", error);
+                aiStatus.innerText = '❌ AI Extraction Failed. Check console or internet connection.';
+                aiStatus.style.color = 'red';
             }
         });
+    }
 
-        document.addEventListener('fullscreenchange', () => {
-            if (document.fullscreenElement) {
-                fullscreenBtn.style.display = 'none';
-            } else {
-                fullscreenBtn.style.display = 'block';
-            }
-        });
-    </script>
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const team = document.getElementById('teamSelect').value;
+        const hue = Math.floor(Math.random() * 360); 
+        const font = FONTS[Math.floor(Math.random() * FONTS.length)];
+        const effect = EFFECTS[Math.floor(Math.random() * EFFECTS.length)];
+        const num = document.getElementById('playerSelect').value;
+        const yOffset = parseInt(document.getElementById('yPosSlider').value);
+
+        document.getElementById('log').innerText = `Color Hue: ${hue} | Font: ${font} | Style: ${effect}`;
+
+        // LAYER 1: TINTED BACKGROUND OR POSTER BG
+        if (currentMode === 'sandwich' && imgBG) {
+            drawFit(imgBG);
+            
+            ctx.save();
+            ctx.globalCompositeOperation = 'multiply';
+            ctx.fillStyle = `hsla(${hue}, 70%, 50%, 0.4)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.globalCompositeOperation = 'overlay';
+            ctx.fillStyle = `hsla(${hue}, 80%, 40%, 0.3)`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+        } else {
+            drawPosterBG(hue);
+        }
+
+        // LAYER 2: THE TEXT
+        drawComplexText(num, font, hue, yOffset, effect);
+
+        // LAYER 3: THE AI EXTRACTED PLAYER CUTOUT
+        if (imgCutout) {
+            drawFit(imgCutout);
+        }
+
+        // OVERLAY: CINEMATIC EFFECTS
+        addCinematicOverlay();
+    }
+
+    function drawFit(img) {
+        const ratio = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * ratio; const h = img.height * ratio;
+        ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+    }
+
+    function drawPosterBG(hue) {
+        const g = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        g.addColorStop(0, `hsl(${hue}, 80%, 20%)`);
+        g.addColorStop(1, '#000');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.1)`;
+        for(let i=0; i<3; i++) {
+            ctx.beginPath();
+            ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 600, 0, Math.PI*2);
+            ctx.fill();
+        }
+    }
+
+    function drawComplexText(text, font, hue, y, effect) {
+        ctx.save();
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `bold 950px "${font}"`;
+        if (['Monoton', 'Nosifer', 'Press Start 2P', 'Bungee Shade'].includes(font)) ctx.font = `bold 600px "${font}"`;
+        
+        const x = canvas.width / 2;
+        if (effect === 'GLITCH') {
+            ctx.fillStyle = "#ff0080"; ctx.fillText(text, x - 15, y);
+            ctx.fillStyle = "#00ffff"; ctx.fillText(text, x + 15, y);
+            ctx.fillStyle = "white"; ctx.fillText(text, x, y);
+        } else if (effect === 'NEON') {
+            ctx.shadowBlur = 80; ctx.shadowColor = `hsl(${hue}, 100%, 60%)`;
+            ctx.strokeStyle = "white"; ctx.lineWidth = 20; ctx.strokeText(text, x, y);
+            ctx.fillStyle = "rgba(255,255,255,0.1)"; ctx.fillText(text, x, y);
+        } else if (effect === 'CHROME') {
+            const grd = ctx.createLinearGradient(0, y-400, 0, y+400);
+            grd.addColorStop(0, "#fff"); grd.addColorStop(0.5, "#888"); grd.addColorStop(1, "#333");
+            ctx.fillStyle = grd; ctx.fillText(text, x, y);
+        } else {
+            ctx.fillStyle = "white"; ctx.fillText(text, x, y);
+        }
+        ctx.restore();
+    }
+
+    function addCinematicOverlay() {
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        for(let i=0; i<800; i++) { ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 2, 2); }
+        
+        const v = ctx.createRadialGradient(540, 960, 200, 540, 960, 1600);
+        v.addColorStop(0, "transparent"); v.addColorStop(1, "rgba(0,0,0,0.85)");
+        ctx.fillStyle = v; ctx.fillRect(0,0,canvas.width,canvas.height);
+    }
+    
+    document.getElementById('yPosSlider').addEventListener('input', render);
+</script>
 </body>
 </html>
