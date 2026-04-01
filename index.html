@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>डायनामिक दीवार घड़ी</title>
+    <style>
+        /* बेसिक रीसेट और बैकग्राउंड सेटिंग्स */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* बैकग्राउंड ब्राउन */
+            background-color: brown; 
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* फुलस्क्रीन बटन का डिज़ाइन */
+        #fullscreen-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        #fullscreen-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.05);
+        }
+
+        /* घड़ी का मुख्य ढांचा (Edge to Edge Dynamic) */
+        .clock {
+            width: 85vmin; /* स्क्रीन के हिसाब से खुद को एडजस्ट करेगा */
+            height: 85vmin;
+            background-color: skyblue; /* अंदर का रंग स्काई-ब्लू */
+            border: 4vmin solid green; /* बाहरी रिंग ग्रीन */
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        /* घड़ी के बीच का बिंदु */
+        .clock::after {
+            content: '';
+            position: absolute;
+            width: 4vmin;
+            height: 4vmin;
+            background-color: #111;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* कांटों की सामान्य स्टाइलिंग */
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 10px 10px 0 0;
+            z-index: 5;
+        }
+
+        /* घंटे का कांटा (Hour Hand) - गहरा नीला/काला */
+        .hour {
+            width: 2.5vmin;
+            height: 22vmin;
+            background-color: #2c3e50; 
+            margin-left: -1.25vmin;
+        }
+
+        /* मिनट का कांटा (Minute Hand) - बैंगनी */
+        .minute {
+            width: 1.5vmin;
+            height: 32vmin;
+            background-color: #8e44ad; 
+            margin-left: -0.75vmin;
+        }
+
+        /* सेकंड का कांटा (Second Hand) - लाल */
+        .second {
+            width: 0.6vmin;
+            height: 36vmin;
+            background-color: #e74c3c; 
+            margin-left: -0.3vmin;
+            z-index: 6;
+        }
+
+        /* दिन और तारीख का बॉक्स */
+        .date-display {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 1.5vmin 3vmin;
+            border-radius: 10px;
+            font-size: 3.5vmin;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
+
+        /* घड़ी के नंबर/निशान */
+        .mark-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        
+        .mark {
+            position: absolute;
+            width: 1vmin;
+            height: 4vmin;
+            background-color: #222;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 1vmin;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="fullscreen-btn">Fullscreen / फुलस्क्रीन</button>
+
+    <div class="clock" id="clock">
+        <div id="date-display" class="date-display"></div>
+        
+        <div class="hand hour" id="hour"></div>
+        <div class="hand minute" id="minute"></div>
+        <div class="hand second" id="second"></div>
+    </div>
+
+    <script>
+        // 1. घड़ी के 12 निशान (Marks) बनाने का कोड
+        const clock = document.getElementById('clock');
+        for (let i = 0; i < 12; i++) {
+            let markContainer = document.createElement('div');
+            markContainer.className = 'mark-container';
+            markContainer.style.transform = `rotate(${i * 30}deg)`; // हर निशान 30 डिग्री पर
+            
+            let mark = document.createElement('div');
+            mark.className = 'mark';
+            
+            // 12, 3, 6, 9 को थोड़ा बड़ा दिखाने के लिए
+            if (i % 3 === 0) {
+                mark.style.height = '6vmin';
+                mark.style.width = '1.5vmin';
+            }
+
+            markContainer.appendChild(mark);
+            clock.appendChild(markContainer);
+        }
+
+        // 2. घड़ी को चलाने का कोड (समय और कांटे सेट करना)
+        const hourHand = document.getElementById('hour');
+        const minuteHand = document.getElementById('minute');
+        const secondHand = document.getElementById('second');
+        const dateDisplay = document.getElementById('date-display');
+
+        function setClock() {
+            const currentDate = new Date();
+            
+            // समय का अनुपात (Ratio) निकालना
+            const secondsRatio = currentDate.getSeconds() / 60;
+            const minutesRatio = (secondsRatio + currentDate.getMinutes()) / 60;
+            const hoursRatio = (minutesRatio + currentDate.getHours()) / 12;
+
+            // कांटों को घुमाना (Rotate)
+            setRotation(secondHand, secondsRatio);
+            setRotation(minuteHand, minutesRatio);
+            setRotation(hourHand, hoursRatio);
+
+            // दिन और तारीख सेट करना (हिंदी/अंग्रेजी मिक्स फॉर्मेट में)
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateDisplay.innerText = currentDate.toLocaleDateString('hi-IN', options);
+        }
+
+        function setRotation(element, rotationRatio) {
+            element.style.transform = `rotate(${rotationRatio * 360}deg)`;
+        }
+
+        // हर 1 सेकंड (1000ms) में समय अपडेट करें
+        setInterval(setClock, 1000);
+        setClock(); // पेज लोड होते ही समय दिखाएं
+
+        // 3. फुलस्क्रीन बटन का लॉजिक
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`फुलस्क्रीन करने में समस्या आई: ${err.message}`);
+                });
+            }
+        });
+
+        // जैसे ही फुलस्क्रीन चालू या बंद हो, बटन को गायब या वापस लाएं
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                fullscreenBtn.style.display = 'none'; // फुलस्क्रीन में बटन गायब
+            } else {
+                fullscreenBtn.style.display = 'block'; // फुलस्क्रीन से बाहर आने पर वापस
+            }
+        });
+    </script>
+</body>
+</html>
