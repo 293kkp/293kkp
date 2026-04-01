@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPL 2026 Infinity Edit Studio</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Stalinist+One&family=Permanent+Marker&family=Monoton&family=Luckiest+Guy&family=Black+Ops+One&family=Righteous&family=Nosifer&family=Shojumaru&family=Press+Start+2P&family=Bungee+Shade&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@imgly/background-removal@1.4.3/dist/browser/bundle.umd.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.3/dist/browser/bundle.umd.js"></script>
+    
     <style>
         :root { --accent: #f4a623; --surface: #12121a; }
         body { font-family: 'Segoe UI', sans-serif; background: #050508; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
@@ -19,14 +21,19 @@
         select, button, input[type="file"] { width: 100%; padding: 12px; border-radius: 10px; border: none; font-size: 14px; outline: none; box-sizing: border-box; }
         select { background: #1a1a24; color: white; border: 1px solid #333; cursor: pointer; }
         .upload-section { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        input[type="file"] { background: #000; color: #888; font-size: 11px; border: 1px solid #333; }
+        
+        /* Updated Input Styling */
+        input[type="file"] { background: #000; color: #888; font-size: 11px; border: 1px solid #333; transition: 0.3s; }
+        input[type="file"]:disabled { opacity: 0.5; cursor: not-allowed; }
+        input[type="file"].ready { border: 1px solid #00ff00; color: #00ff00; }
+        
         .slider-wrap { background: #1a1a24; padding: 10px; border-radius: 10px; border: 1px solid #333; margin-top: 10px; }
         input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
         .gen-btn { background: var(--accent); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 15px; font-size: 16px; box-shadow: 0 4px 15px rgba(244,166,35,0.3); }
         .gen-btn:hover { background: white; transform: translateY(-2px); }
         canvas { max-width: 100%; height: auto; border-radius: 15px; border: 2px solid #222; background: #000; margin-top: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); }
         .status-text { font-size: 11px; color: var(--accent); margin-top: 10px; font-family: monospace; text-align: center; }
-        #aiStatus { display: none; color: #00ffff; font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold; background: #1e1e26; padding: 10px; border-radius: 8px; border: 1px solid #333; }
+        #aiStatus { display: block; color: #f4a623; font-size: 12px; margin-top: 10px; text-align: center; font-weight: bold; background: #1e1e26; padding: 10px; border-radius: 8px; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -49,10 +56,10 @@
         <div class="upload-section" id="uploadPanel">
             <div id="bgInputWrap">
                 <label>Upload Player Image (AI will extract automatically)</label>
-                <input type="file" id="imageLoader" accept="image/*">
+                <input type="file" id="imageLoader" accept="image/*" disabled>
             </div>
         </div>
-        <div id="aiStatus">🤖 AI is cutting out the player... Please wait...</div>
+        <div id="aiStatus">⏳ Downloading AI Engine... Please wait...</div>
     </div>
     
     <div class="slider-wrap"><label style="margin:0; color:var(--accent)">Vertical Position Offset</label><input type="range" id="yPosSlider" min="200" max="1600" value="750"></div>
@@ -88,7 +95,7 @@
     let imgCutout = null;
     let currentMode = 'sandwich';
 
-    (function init() {
+    function init() {
         const teamSelect = document.getElementById('teamSelect');
         for (let t in SQUADS) {
             let opt = document.createElement("option");
@@ -97,7 +104,8 @@
         }
         updateSquad();
         setupImageLoader();
-    })();
+        startAIChecker(); // Start the background polling
+    }
 
     function updateSquad() {
         const team = document.getElementById('teamSelect').value;
@@ -118,50 +126,73 @@
         render();
     }
 
+    // SMART LOCK MECHANISM
+    function startAIChecker() {
+        const imageLoader = document.getElementById('imageLoader');
+        const aiStatus = document.getElementById('aiStatus');
+        
+        let retryCount = 0;
+        let aiCheck = setInterval(() => {
+            retryCount++;
+            
+            // Check if the AI library has successfully attached to the browser
+            if (typeof imglyRemoveBackground !== 'undefined') {
+                clearInterval(aiCheck);
+                imageLoader.disabled = false;
+                imageLoader.classList.add('ready');
+                aiStatus.innerText = '✅ AI Ready! You can now choose a file.';
+                aiStatus.style.color = '#00ff00';
+                setTimeout(() => aiStatus.style.display = 'none', 4000);
+            } 
+            // If it takes more than 20 seconds, it's definitely blocked
+            else if (retryCount > 20) {
+                clearInterval(aiCheck);
+                aiStatus.innerText = '❌ AI blocked by browser. Turn off ad-blockers and refresh.';
+                aiStatus.style.color = 'red';
+            }
+        }, 1000); // Check every 1 second
+    }
+
     function setupImageLoader() {
         document.getElementById('imageLoader').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 1. Immediately load original image as the background
             const bgUrl = URL.createObjectURL(file);
             const img = new Image();
             img.onload = () => { 
                 imgBG = img; 
-                render(); // Show the background right away
+                render(); 
             };
             img.src = bgUrl;
 
-            // 2. Setup UI for AI processing
             const aiStatus = document.getElementById('aiStatus');
             aiStatus.style.display = 'block';
             aiStatus.style.color = '#00ffff';
-            aiStatus.innerText = '⏳ Downloading AI Model & processing... Please wait...';
+            aiStatus.innerText = '🤖 Extracting Player... Please wait...';
 
-            // 3. Configure public path to bypass mobile file restrictions
             const config = {
-                publicPath: "https://unpkg.com/@imgly/background-removal@1.4.3/dist/"
+                publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.3/dist/"
             };
 
             try {
-                // 4. Run the AI Extractor
                 const imageBlob = await imglyRemoveBackground(file, config);
                 const cutoutUrl = URL.createObjectURL(imageBlob);
                 
-                // 5. Load the new transparent cutout as the top layer
                 const cutout = new Image();
                 cutout.onload = () => { 
                     imgCutout = cutout; 
                     aiStatus.innerText = '✅ Player extracted successfully!';
                     aiStatus.style.color = '#00ff00';
                     setTimeout(() => aiStatus.style.display = 'none', 3000);
-                    render(); // Re-render to show the final text sandwich
+                    render(); 
                 };
                 cutout.src = cutoutUrl;
                 
             } catch (error) {
                 console.error("AI Error:", error);
-                aiStatus.innerText = '❌ AI Extraction Failed. Check console or internet connection.';
+                const errorMessage = error.message || error.toString();
+                aiStatus.innerText = `❌ Error: ${errorMessage}`;
                 aiStatus.style.color = 'red';
             }
         });
@@ -178,10 +209,8 @@
 
         document.getElementById('log').innerText = `Color Hue: ${hue} | Font: ${font} | Style: ${effect}`;
 
-        // LAYER 1: TINTED BACKGROUND OR POSTER BG
         if (currentMode === 'sandwich' && imgBG) {
             drawFit(imgBG);
-            
             ctx.save();
             ctx.globalCompositeOperation = 'multiply';
             ctx.fillStyle = `hsla(${hue}, 70%, 50%, 0.4)`;
@@ -197,15 +226,12 @@
             drawPosterBG(hue);
         }
 
-        // LAYER 2: THE TEXT
         drawComplexText(num, font, hue, yOffset, effect);
 
-        // LAYER 3: THE AI EXTRACTED PLAYER CUTOUT
         if (imgCutout) {
             drawFit(imgCutout);
         }
 
-        // OVERLAY: CINEMATIC EFFECTS
         addCinematicOverlay();
     }
 
@@ -265,6 +291,9 @@
     }
     
     document.getElementById('yPosSlider').addEventListener('input', render);
+
+    init();
+
 </script>
 </body>
 </html>
