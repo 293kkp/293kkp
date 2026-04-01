@@ -3,61 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>IPL 2026 Studio - Gradient Master</title>
+    <title>IPL 2026 Studio - Clean Sandwich</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Russo+One&family=Stalinist+One&family=Permanent+Marker&family=Monoton&family=Luckiest+Guy&family=Righteous&family=Nosifer&family=Shojumaru&family=Press+Start+2P&family=Black+Ops+One&family=Creepster&family=Rubik+Glitch&family=Faster+One&family=Bungee+Shade&family=Fascinate&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #f4a623; --surface: #12121a; }
-        
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: #000; color: white; font-family: 'Segoe UI', sans-serif;
-            overflow: hidden; display: flex; flex-direction: column;
-        }
-
-        .preview-area {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            padding: 5px; background: radial-gradient(circle, #1a1a24 0%, #000 100%);
-            min-height: 0;
-        }
-
-        .canvas-wrapper {
-            height: 100%; aspect-ratio: 9/16; position: relative;
-            box-shadow: 0 0 30px rgba(0,0,0,1); border-radius: 6px;
-            overflow: hidden; border: 1px solid #222;
-        }
-
+        :root { --accent: #f4a623; --surface: #12121a; --save: #2ecc71; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
+        .preview-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 5px; background: radial-gradient(circle, #1a1a24 0%, #000 100%); min-height: 0; }
+        .canvas-wrapper { height: 100%; aspect-ratio: 9/16; position: relative; box-shadow: 0 0 30px rgba(0,0,0,1); border-radius: 6px; overflow: hidden; border: 1px solid #222; }
         canvas { width: 100%; height: 100%; background: #000; touch-action: none; }
-
-        .editor-controls {
-            height: auto; width: 100%; background: var(--surface);
-            border-top: 1px solid #333; padding: 10px 15px; box-sizing: border-box; z-index: 100;
-        }
-
-        h2 { font-family: 'Bebas Neue', sans-serif; color: var(--accent); margin: 0 0 8px 0; font-size: 18px; text-align: center; }
-
-        .tab-row { display: flex; gap: 5px; margin-bottom: 8px; }
+        .editor-controls { height: auto; width: 100%; background: var(--surface); border-top: 1px solid #333; padding: 8px 12px; box-sizing: border-box; z-index: 100; }
+        .tab-row { display: flex; gap: 5px; margin-bottom: 6px; }
         .tab { flex: 1; padding: 6px; background: #000; border-radius: 5px; cursor: pointer; text-align: center; font-size: 10px; font-weight: bold; border: 1px solid #333; }
         .tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
-
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 6px; }
         .span-2 { grid-column: span 2; }
         label { display: block; font-size: 8px; color: #888; text-transform: uppercase; margin-bottom: 2px; font-weight: bold; }
         select, input, button { width: 100%; padding: 7px; border-radius: 5px; border: none; font-size: 11px; outline: none; box-sizing: border-box; background: #08080c; color: white; border: 1px solid #222; }
-        
-        input[type="color"] { padding: 2px; height: 30px; cursor: pointer; }
-        
+        input[type="color"] { padding: 2px; height: 28px; cursor: pointer; }
         .btn-main { background: var(--accent); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; }
+        .btn-save { background: var(--save); color: black; font-weight: 900; cursor: pointer; text-transform: uppercase; border: none; }
         .btn-sub { background: #222; color: white; font-size: 9px; cursor: pointer; }
-
         .hint { font-size: 8px; color: #444; text-align: center; margin-top: 4px; }
     </style>
 </head>
 <body>
 
     <div class="preview-area">
-        <div class="canvas-wrapper">
-            <canvas id="mainCanvas"></canvas>
-        </div>
+        <div class="canvas-wrapper"><canvas id="mainCanvas"></canvas></div>
     </div>
 
     <div class="editor-controls">
@@ -65,227 +37,225 @@
             <div class="tab active" id="tabSandwich" onclick="setMode('sandwich')">SANDWICH</div>
             <div class="tab" id="tabPoster" onclick="setMode('poster')">POSTER</div>
         </div>
-
         <div class="form-grid">
-            <div class="span-2"><label>Team / Player</label>
-                <div style="display:flex; gap:5px;">
-                    <select id="teamSelect" onchange="updateSquad()"></select>
-                    <select id="playerSelect" onchange="updateContent()"></select>
-                </div>
-            </div>
-            <div><label>Text Color</label><input type="color" id="textColor" value="#ffffff" oninput="render()"></div>
+            <div class="span-2"><div style="display:flex; gap:5px;"><select id="teamSelect" onchange="updateSquad()"></select><select id="playerSelect" onchange="updateContent()"></select></div></div>
+            <button class="btn-save" onclick="saveImage()">Save PNG</button>
         </div>
-
         <div class="form-grid">
-            <div class="span-2"><label>Custom Text</label><input type="text" id="customText" placeholder="GOAT" oninput="updateContent()"></div>
-            <div><label>BG Start</label><input type="color" id="gradStart" value="#f4a623" oninput="render()"></div>
+            <div class="span-2"><input type="text" id="customText" placeholder="ADD TEXT (GOAT)" oninput="updateContent()"></div>
+            <div><input type="color" id="textColor" value="#ffffff" oninput="render()"></div>
         </div>
-
         <div class="form-grid">
-            <div class="span-2" id="bgField"><label>1. BG Photo</label><input type="file" id="bgLoader"></div>
+            <div class="span-2" id="bgField"><input type="file" id="bgLoader"></div>
             <div class="span-2" id="posterActions" style="display:none;"><button class="btn-sub" onclick="randomizeColors()">Random Gradient</button></div>
-            <div><label>BG End</label><input type="color" id="gradEnd" value="#000000" oninput="render()"></div>
+            <div style="display:flex; gap:4px;" id="colorInputs">
+                <input type="color" id="gradStart" value="#f4a623" oninput="render()">
+                <input type="color" id="gradEnd" value="#000000" oninput="render()">
+            </div>
         </div>
-
         <div class="form-grid">
-            <div class="span-2"><label id="cutoutLabel">2. Cutout</label><input type="file" id="cutoutLoader"></div>
+            <div class="span-2"><input type="file" id="cutoutLoader"></div>
             <button class="btn-main" onclick="randomizeStyle()">Font</button>
         </div>
-        
-        <div class="hint">Drag to move | Corners to resize | Top to rotate</div>
+        <div class="hint">Sandwich: Pure Background | Poster: Gradient Background</div>
     </div>
 
 <script>
-    const SQUADS = {
-        csk:{"MS Dhoni":7,"Ruturaj Gaikwad":31,"Sanju Samson":16,"Shivam Dube":54},
-        mi:{"Rohit Sharma":45,"Hardik Pandya":228,"Surya Kumar Yadav":63,"Jasprit Bumrah":93},
-        rcb:{"Virat Kohli":18,"Rajat Patidar":1,"Phil Salt":28,"Devdutt Padikkal":10},
-        dc:{"Axar Patel":20,"KL Rahul":1,"Kuldeep Yadav":16,"Mitchell Starc":56},
-        gt:{"Shubman Gill":77,"Sai Sudharsan":41,"Jos Buttler":63,"Rashid Khan":19},
-        srh:{"Pat Cummins":30,"Travis Head":35,"Heinrich Klaasen":24,"Abhishek Sharma":7}
+const SQUADS = {
+    csk:{"Ruturaj Gaikwad":31,"MS Dhoni":7,"Sanju Samson":16,"Shivam Dube":54,"Dewald Brevis":11,"Noor Ahmad":15,"Khaleel Ahmed":10},
+    mi:{"Hardik Pandya":228,"Rohit Sharma":45,"Suryakumar Yadav":63,"Jasprit Bumrah":93,"Trent Boult":19,"Quinton de Kock":25,"Shardul Thakur":54},
+    rcb:{"Virat Kohli":18,"Rajat Patidar":1,"Phil Salt":28,"Devdutt Padikkal":10,"Josh Hazlewood":38,"Bhuvneshwar Kumar":15,"Venkatesh Iyer":19},
+    dc:{"Axar Patel":20,"KL Rahul":1,"Kuldeep Yadav":16,"Tristan Stubbs":4,"Mitchell Starc":56,"Nitish Rana":17,"Prithvi Shaw":24},
+    gt:{"Shubman Gill":77,"Sai Sudharsan":41,"Jos Buttler":63,"Rashid Khan":19,"Mohammed Siraj":13,"Prasidh Krishna":14,"Kagiso Rabada":12},
+    srh:{"Pat Cummins":30,"Travis Head":35,"Heinrich Klaasen":24,"Abhishek Sharma":7,"Ishan Kishan":23,"Nitish Kumar Reddy":38},
+    rr:{"Riyan Parag":9,"Yashasvi Jaiswal":4,"Ravindra Jadeja":8,"Jofra Archer":22,"Sam Curran":58,"Ravi Bishnoi":7},
+    kkr:{"Ajinkya Rahane":27,"Rinku Singh":12,"Cameron Green":51,"Rachin Ravindra":3,"Sunil Narine":11,"Varun Chakaravarthy":29},
+    lsg:{"Rishabh Pant":17,"Nicholas Pooran":24,"Aiden Markram":7,"Wanindu Hasaranga":4,"Mohammad Shami":11,"Mayank Yadav":88},
+    pbks:{"Shreyas Iyer":41,"Arshdeep Singh":2,"Yuzvendra Chahal":3,"Marcus Stoinis":18,"Harpreet Brar":21}
+};
+
+const FONTS = ['Impact', 'Bebas Neue', 'Russo One', 'Stalinist One', 'Permanent Marker', 'Monoton', 'Righteous', 'Nosifer', 'Shojumaru', 'Press Start 2P', 'Faster One', 'Rubik Glitch'];
+const TEAM_COLORS = { csk:'#f5c518', mi:'#004b8d', rcb:'#c41e3a', dc:'#1a5dd9', gt:'#1b2133', srh:'#f26522', rr:'#e83e8c', kkr:'#6a0dad', lsg:'#c8102e', pbks:'#b22222' };
+
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 1080; canvas.height = 1920;
+
+let imgBG = null, imgCutout = null, currentFont = 'Impact', currentMode = 'sandwich';
+let items = [
+    { id: 'num', text: '7', x: 540, y: 700, size: 700, rotation: 0, w: 0, h: 0 },
+    { id: 'txt', text: '', x: 540, y: 1150, size: 180, rotation: 0, w: 0, h: 0 }
+];
+
+let selectedItem = null, dragMode = null, startMouseAngle, initialRotation, startDist, startSize, dragOffset;
+
+(function init() {
+    const ts = document.getElementById('teamSelect');
+    for (let t in SQUADS) ts.add(new Option(t.toUpperCase(), t));
+    updateSquad();
+    setupLoaders();
+    setupInteraction();
+    render();
+})();
+
+function updateSquad() {
+    const team = document.getElementById('teamSelect').value;
+    document.getElementById('gradStart').value = TEAM_COLORS[team] || '#1a1a24';
+    const ps = document.getElementById('playerSelect');
+    ps.innerHTML = "";
+    for (let n in SQUADS[team]) ps.add(new Option(`${n} (${SQUADS[team][n]})`, SQUADS[team][n]));
+    updateContent();
+}
+
+function updateContent() {
+    items[0].text = document.getElementById('playerSelect').value;
+    items[1].text = document.getElementById('customText').value;
+    render();
+}
+
+function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('tabSandwich').classList.toggle('active', mode === 'sandwich');
+    document.getElementById('tabPoster').classList.toggle('active', mode === 'poster');
+    document.getElementById('bgField').style.display = mode === 'sandwich' ? 'block' : 'none';
+    document.getElementById('posterActions').style.display = mode === 'poster' ? 'block' : 'none';
+    document.getElementById('colorInputs').style.display = mode === 'poster' ? 'flex' : 'none';
+    render();
+}
+
+function saveImage() {
+    selectedItem = null; render();
+    const link = document.createElement('a');
+    link.download = `IPL2026_Edit.png`;
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
+}
+
+function randomizeColors() {
+    const r = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+    document.getElementById('gradStart').value = r();
+    document.getElementById('gradEnd').value = '#000000';
+    render();
+}
+
+function randomizeStyle() {
+    currentFont = FONTS[Math.floor(Math.random() * FONTS.length)];
+    render();
+}
+
+function setupLoaders() {
+    const load = (id, cb) => document.getElementById(id).onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => { const img = new Image(); img.onload = () => { cb(img); render(); }; img.src = ev.target.result; };
+        reader.readAsDataURL(e.target.files[0]);
     };
-    const FONTS = ['Impact', 'Bebas Neue', 'Russo One', 'Stalinist One', 'Permanent Marker', 'Monoton', 'Righteous', 'Nosifer', 'Shojumaru', 'Press Start 2P', 'Bungee Shade', 'Faster One', 'Rubik Glitch'];
-    const TEAM_COLORS = { csk: '#f5c518', mi: '#004b8d', rcb: '#c41e3a', dc: '#1a5dd9', gt: '#1b2133', srh: '#f26522' };
+    load('bgLoader', (img) => imgBG = img);
+    load('cutoutLoader', (img) => imgCutout = img);
+}
 
-    const canvas = document.getElementById('mainCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 1080; canvas.height = 1920;
+function getMouse(e) {
+    const r = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - r.left) * (1080 / r.width), y: (clientY - r.top) * (1920 / r.height) };
+}
 
-    let imgBG = null, imgCutout = null, currentFont = 'Impact', currentMode = 'sandwich';
-
-    let items = [
-        { id: 'num', text: '7', x: 540, y: 700, size: 700, rotation: 0, w: 0, h: 0 },
-        { id: 'txt', text: '', x: 540, y: 1150, size: 180, rotation: 0, w: 0, h: 0 }
-    ];
-
-    let selectedItem = null, dragMode = null;
-    let startMouseAngle = 0, initialRotation = 0, startDist = 0, startSize = 0, dragOffset = {x:0, y:0};
-
-    (function init() {
-        const ts = document.getElementById('teamSelect');
-        for (let t in SQUADS) ts.add(new Option(t.toUpperCase(), t));
-        updateSquad();
-        setupLoaders();
-        setupInteraction();
-        render();
-    })();
-
-    function updateSquad() {
-        const team = document.getElementById('teamSelect').value;
-        document.getElementById('gradStart').value = TEAM_COLORS[team] || '#1a1a24';
-        const ps = document.getElementById('playerSelect');
-        ps.innerHTML = "";
-        for (let n in SQUADS[team]) ps.add(new Option(`${n} (${SQUADS[team][n]})`, SQUADS[team][n]));
-        updateContent();
-    }
-
-    function updateContent() {
-        items[0].text = document.getElementById('playerSelect').value;
-        items[1].text = document.getElementById('customText').value;
-        render();
-    }
-
-    function setMode(mode) {
-        currentMode = mode;
-        document.getElementById('tabSandwich').classList.toggle('active', mode === 'sandwich');
-        document.getElementById('tabPoster').classList.toggle('active', mode === 'poster');
-        document.getElementById('bgField').style.display = mode === 'sandwich' ? 'block' : 'none';
-        document.getElementById('posterActions').style.display = mode === 'poster' ? 'block' : 'none';
-        render();
-    }
-
-    function randomizeColors() {
-        const r = () => '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
-        document.getElementById('gradStart').value = r();
-        document.getElementById('gradEnd').value = '#000000';
-        render();
-    }
-
-    function randomizeStyle() {
-        currentFont = FONTS[Math.floor(Math.random() * FONTS.length)];
-        render();
-    }
-
-    function setupLoaders() {
-        const load = (id, cb) => document.getElementById(id).onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => { 
-                const img = new Image(); 
-                img.onload = () => { cb(img); render(); }; 
-                img.src = ev.target.result; 
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        };
-        load('bgLoader', (img) => imgBG = img);
-        load('cutoutLoader', (img) => imgCutout = img);
-    }
-
-    function getMouse(e) {
-        const r = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: (clientX - r.left) * (1080 / r.width), y: (clientY - r.top) * (1920 / r.height) };
-    }
-
-    function setupInteraction() {
-        const start = (e) => {
-            const pos = getMouse(e);
-            for (let item of [...items].reverse()) {
-                if (!item.text && item.id === 'txt') continue;
-                const rx = item.x + Math.sin(item.rotation) * -(item.h/2 + 120);
-                const ry = item.y - Math.cos(item.rotation) * (item.h/2 + 120);
-                if (Math.hypot(pos.x - rx, pos.y - ry) < 80) {
-                    selectedItem = item; dragMode = 'rotate';
-                    startMouseAngle = Math.atan2(pos.y - item.y, pos.x - item.x);
-                    initialRotation = item.rotation; return;
-                }
-                const resX = item.x + (item.w/2 * Math.cos(item.rotation)) - (item.h/2 * Math.sin(item.rotation));
-                const resY = item.y + (item.w/2 * Math.sin(item.rotation)) + (item.h/2 * Math.cos(item.rotation));
-                if (Math.hypot(pos.x - resX, pos.y - resY) < 80) {
-                    selectedItem = item; dragMode = 'resize';
-                    startDist = Math.hypot(pos.x - item.x, pos.y - item.y);
-                    startSize = item.size; return;
-                }
-                const dx = pos.x - item.x, dy = pos.y - item.y;
-                const hx = dx * Math.cos(-item.rotation) - dy * Math.sin(-item.rotation);
-                const hy = dx * Math.sin(-item.rotation) + dy * Math.cos(-item.rotation);
-                if (Math.abs(hx) < item.w/2 + 40 && Math.abs(hy) < item.h/2 + 40) {
-                    selectedItem = item; dragMode = 'move';
-                    dragOffset = { x: dx, y: dy }; render(); return;
-                }
+function setupInteraction() {
+    const start = (e) => {
+        const pos = getMouse(e);
+        for (let item of [...items].reverse()) {
+            if (!item.text && item.id === 'txt') continue;
+            const rx = item.x + Math.sin(item.rotation) * -(item.h/2 + 120);
+            const ry = item.y - Math.cos(item.rotation) * (item.h/2 + 120);
+            if (Math.hypot(pos.x - rx, pos.y - ry) < 80) {
+                selectedItem = item; dragMode = 'rotate';
+                startMouseAngle = Math.atan2(pos.y - item.y, pos.x - item.x);
+                initialRotation = item.rotation; return;
             }
-            selectedItem = null; render();
-        };
-        const move = (e) => {
-            if (!selectedItem || !dragMode) return;
-            const pos = getMouse(e);
-            if (dragMode === 'move') { selectedItem.x = pos.x - dragOffset.x; selectedItem.y = pos.y - dragOffset.y; }
-            else if (dragMode === 'rotate') { 
-                selectedItem.rotation = initialRotation + (Math.atan2(pos.y - selectedItem.y, pos.x - selectedItem.x) - startMouseAngle);
-            } else if (dragMode === 'resize') {
-                selectedItem.size = Math.max(50, (Math.hypot(pos.x - selectedItem.x, pos.y - selectedItem.y) / startDist) * startSize);
+            const resX = item.x + (item.w/2 * Math.cos(item.rotation)) - (item.h/2 * Math.sin(item.rotation));
+            const resY = item.y + (item.w/2 * Math.sin(item.rotation)) + (item.h/2 * Math.cos(item.rotation));
+            if (Math.hypot(pos.x - resX, pos.y - resY) < 80) {
+                selectedItem = item; dragMode = 'resize';
+                startDist = Math.hypot(pos.x - item.x, pos.y - item.y);
+                startSize = item.size; return;
             }
-            render();
-        };
-        canvas.addEventListener('mousedown', start);
-        window.addEventListener('mousemove', move);
-        window.addEventListener('mouseup', () => dragMode = null);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); }, {passive:false});
-        window.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); }, {passive:false});
-        window.addEventListener('touchend', () => dragMode = null);
-    }
+            const dx = pos.x - item.x, dy = pos.y - item.y;
+            const hx = dx * Math.cos(-item.rotation) - dy * Math.sin(-item.rotation);
+            const hy = dx * Math.sin(-item.rotation) + dy * Math.cos(-item.rotation);
+            if (Math.abs(hx) < item.w/2 + 40 && Math.abs(hy) < item.h/2 + 40) {
+                selectedItem = item; dragMode = 'move';
+                dragOffset = { x: dx, y: dy }; render(); return;
+            }
+        }
+        selectedItem = null; render();
+    };
+    const move = (e) => {
+        if (!selectedItem || !dragMode) return;
+        const pos = getMouse(e);
+        if (dragMode === 'move') { selectedItem.x = pos.x - dragOffset.x; selectedItem.y = pos.y - dragOffset.y; }
+        else if (dragMode === 'rotate') { 
+            selectedItem.rotation = initialRotation + (Math.atan2(pos.y - selectedItem.y, pos.x - selectedItem.x) - startMouseAngle);
+        } else if (dragMode === 'resize') {
+            selectedItem.size = Math.max(50, (Math.hypot(pos.x - selectedItem.x, pos.y - selectedItem.y) / startDist) * startSize);
+        }
+        render();
+    };
+    canvas.addEventListener('mousedown', start);
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', () => dragMode = null);
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); }, {passive:false});
+    window.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); }, {passive:false});
+    window.addEventListener('touchend', () => dragMode = null);
+}
 
-    function render() {
-        ctx.clearRect(0, 0, 1080, 1920);
+function render() {
+    ctx.clearRect(0, 0, 1080, 1920);
+    
+    if (currentMode === 'sandwich') {
+        // PURE IMAGE BACKGROUND
+        if (imgBG) {
+            const r = Math.max(1080/imgBG.width, 1920/imgBG.height);
+            ctx.drawImage(imgBG, (1080-imgBG.width*r)/2, (1920-imgBG.height*r)/2, imgBG.width*r, imgBG.height*r);
+        } else {
+            ctx.fillStyle = '#111'; ctx.fillRect(0,0,1080,1920);
+        }
+    } else {
+        // GRADIENT BACKGROUND
         const c1 = document.getElementById('gradStart').value;
         const c2 = document.getElementById('gradEnd').value;
-
-        // 1. BG LAYER
         const g = ctx.createLinearGradient(0, 0, 0, 1920);
-        g.addColorStop(0, c1);
-        g.addColorStop(1, c2);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 1080, 1920);
-
-        if (currentMode === 'sandwich' && imgBG) {
-            const r = Math.max(1080/imgBG.width, 1920/imgBG.height);
-            ctx.save();
-            ctx.globalAlpha = 0.6; // Allows gradient tinting to show through
-            ctx.drawImage(imgBG, (1080 - imgBG.width*r)/2, (1920 - imgBG.height*r)/2, imgBG.width*r, imgBG.height*r);
-            ctx.restore();
-        }
-
-        // 2. TEXT LAYERS
-        const color = document.getElementById('textColor').value;
-        items.forEach(item => {
-            if (!item.text && item.id === 'txt') return;
-            ctx.save(); ctx.translate(item.x, item.y); ctx.rotate(item.rotation);
-            ctx.font = `bold ${item.size}px "${currentFont}"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            const m = ctx.measureText(item.text); item.w = m.width; item.h = item.size * 0.8;
-            ctx.shadowBlur = 40; ctx.shadowColor = "rgba(0,0,0,0.8)";
-            ctx.fillStyle = color; ctx.fillText(item.text, 0, 0);
-            if (selectedItem === item) {
-                ctx.strokeStyle = '#f4a623'; ctx.lineWidth = 6; ctx.setLineDash([20, 15]);
-                ctx.strokeRect(-item.w/2 - 30, -item.h/2 - 30, item.w + 60, item.h + 60);
-                ctx.setLineDash([]);
-                ctx.fillStyle = "#f4a623"; ctx.beginPath(); ctx.arc(0, -item.h/2 - 120, 35, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = "white"; ctx.lineWidth = 5; ctx.stroke();
-                ctx.fillStyle = "white"; ctx.fillRect(item.w/2 + 20, item.h/2 + 20, 50, 50);
-            }
-            ctx.restore();
-        });
-
-        // 3. CUTOUT LAYER (TOP)
-        if (imgCutout) {
-            const r = 1080 / imgCutout.width;
-            ctx.drawImage(imgCutout, 0, 1920 - (imgCutout.height*r), 1080, imgCutout.height*r);
-        }
-
-        const v = ctx.createRadialGradient(540, 960, 200, 540, 960, 1600);
-        v.addColorStop(0, "transparent"); v.addColorStop(1, "rgba(0,0,0,0.85)");
-        ctx.fillStyle = v; ctx.fillRect(0,0,1080,1920);
+        g.addColorStop(0, c1); g.addColorStop(1, c2);
+        ctx.fillStyle = g; ctx.fillRect(0, 0, 1080, 1920);
     }
-    window.onload = init;
+
+    const color = document.getElementById('textColor').value;
+    items.forEach(item => {
+        if (!item.text && item.id === 'txt') return;
+        ctx.save(); ctx.translate(item.x, item.y); ctx.rotate(item.rotation);
+        ctx.font = `bold ${item.size}px "${currentFont}"`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const m = ctx.measureText(item.text); item.w = m.width; item.h = item.size * 0.8;
+        ctx.shadowBlur = 40; ctx.shadowColor = "rgba(0,0,0,0.8)";
+        ctx.fillStyle = color; ctx.fillText(item.text, 0, 0);
+        if (selectedItem === item) {
+            ctx.strokeStyle = '#f4a623'; ctx.lineWidth = 6; ctx.setLineDash([20, 15]);
+            ctx.strokeRect(-item.w/2 - 30, -item.h/2 - 30, item.w + 60, item.h + 60);
+            ctx.setLineDash([]);
+            ctx.fillStyle = "#f4a623"; ctx.beginPath(); ctx.arc(0, -item.h/2 - 120, 35, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = "white"; ctx.lineWidth = 5; ctx.stroke();
+            ctx.fillStyle = "white"; ctx.fillRect(item.w/2 + 20, item.h/2 + 20, 50, 50);
+        }
+        ctx.restore();
+    });
+
+    if (imgCutout) {
+        const r = 1080 / imgCutout.width;
+        ctx.drawImage(imgCutout, 0, 1920 - (imgCutout.height*r), 1080, imgCutout.height*r);
+    }
+    const v = ctx.createRadialGradient(540, 960, 200, 540, 960, 1600);
+    v.addColorStop(0, "transparent"); v.addColorStop(1, "rgba(0,0,0,0.8)");
+    ctx.fillStyle = v; ctx.fillRect(0,0,1080,1920);
+}
+window.onload = init;
 </script>
 </body>
 </html>
