@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>डायनामिक दीवार घड़ी</title>
+    <title>Neomorphic Wall Clock</title>
     <style>
-        /* बेसिक रीसेट और बैकग्राउंड सेटिंग्स */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,8 +12,8 @@
         }
 
         body {
-            /* बैकग्राउंड ब्राउन */
-            background-color: brown; 
+            /* ब्राउन बैकग्राउंड */
+            background-color: #8D5524; 
             height: 100vh;
             width: 100vw;
             display: flex;
@@ -24,160 +23,182 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* फुलस्क्रीन बटन का डिज़ाइन */
+        /* नियोमॉर्फिक फुलस्क्रीन बटन */
         #fullscreen-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            background-color: #ffffff;
-            color: #333;
+            background-color: #8D5524;
+            color: #f0f0f0;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            /* ब्राउन बैकग्राउंड पर नियोमॉर्फिक 3D शैडो */
+            box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), 
+                       -6px -6px 12px rgba(255, 255, 255, 0.1);
             z-index: 100;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
-        #fullscreen-btn:hover {
-            background-color: #f0f0f0;
-            transform: scale(1.05);
+        #fullscreen-btn:active {
+            /* क्लिक करने पर अंदर की तरफ दबने का इफ़ेक्ट */
+            box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.4), 
+                        inset -4px -4px 8px rgba(255, 255, 255, 0.1);
         }
 
-        /* घड़ी का मुख्य ढांचा (Edge to Edge Dynamic) */
-        .clock {
-            width: 85vmin; /* स्क्रीन के हिसाब से खुद को एडजस्ट करेगा */
+        /* ग्रीन आउटर रिंग (नियोमॉर्फिक इफ़ेक्ट के साथ) */
+        .clock-ring {
+            width: 85vmin;
             height: 85vmin;
-            background-color: skyblue; /* अंदर का रंग स्काई-ब्लू */
-            border: 4vmin solid green; /* बाहरी रिंग ग्रीन */
+            background-color: #4CAF50; /* ग्रीन */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* बाहर की तरफ उभरा हुआ 3D इफ़ेक्ट */
+            box-shadow: 15px 15px 30px rgba(0, 0, 0, 0.5), 
+                       -15px -15px 30px rgba(255, 255, 255, 0.1);
+        }
+
+        /* स्काई-ब्लू इनर क्लॉक (अंदर की तरफ धंसा हुआ इफ़ेक्ट) */
+        .clock-inner {
+            width: 76vmin;
+            height: 76vmin;
+            background-color: #87CEEB; /* स्काई-ब्लू */
             border-radius: 50%;
             position: relative;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5), inset 0 8px 20px rgba(0,0,0,0.3);
+            /* अंदर की तरफ गहराई (Inset shadow) */
+            box-shadow: inset 12px 12px 24px rgba(0, 0, 0, 0.25), 
+                        inset -12px -12px 24px rgba(255, 255, 255, 0.4);
         }
 
-        /* घड़ी के बीच का बिंदु */
-        .clock::after {
+        /* घड़ी के बीच का 3D बिंदु */
+        .clock-inner::after {
             content: '';
             position: absolute;
             width: 4vmin;
             height: 4vmin;
-            background-color: #111;
+            background-color: #87CEEB;
             border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.3), 
+                       -3px -3px 6px rgba(255,255,255,0.5);
         }
 
-        /* कांटों की सामान्य स्टाइलिंग */
+        /* 1 से 12 तक के नंबरों का डिज़ाइन */
+        .number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 5vmin;
+            font-weight: 700;
+            color: #333;
+            /* नंबरों को भी हल्का 3D लुक देने के लिए टेक्स्ट शैडो */
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6), 
+                        -1px -1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .number div {
+            padding-top: 3vmin;
+        }
+
+        /* कांटों की सामान्य स्टाइलिंग (परछाई के साथ ताकि वे तैरते हुए दिखें) */
         .hand {
             position: absolute;
             bottom: 50%;
             left: 50%;
             transform-origin: bottom center;
-            border-radius: 10px 10px 0 0;
+            border-radius: 10px;
             z-index: 5;
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        /* घंटे का कांटा (Hour Hand) - गहरा नीला/काला */
+        /* घंटे का कांटा */
         .hour {
             width: 2.5vmin;
-            height: 22vmin;
+            height: 20vmin;
             background-color: #2c3e50; 
             margin-left: -1.25vmin;
         }
 
-        /* मिनट का कांटा (Minute Hand) - बैंगनी */
+        /* मिनट का कांटा */
         .minute {
             width: 1.5vmin;
-            height: 32vmin;
+            height: 28vmin;
             background-color: #8e44ad; 
             margin-left: -0.75vmin;
         }
 
-        /* सेकंड का कांटा (Second Hand) - लाल */
+        /* सेकंड का कांटा */
         .second {
             width: 0.6vmin;
-            height: 36vmin;
+            height: 33vmin;
             background-color: #e74c3c; 
             margin-left: -0.3vmin;
             z-index: 6;
         }
 
-        /* दिन और तारीख का बॉक्स */
+        /* छोटा फॉन्ट: दिन और तारीख का नियोमॉर्फिक बॉक्स */
         .date-display {
             position: absolute;
             top: 65%;
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 1.5vmin 3vmin;
-            border-radius: 10px;
-            font-size: 3.5vmin;
-            font-weight: bold;
-            color: #333;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background-color: #87CEEB;
+            padding: 1vmin 2.5vmin;
+            border-radius: 15px;
+            font-size: 2vmin; /* Small font size */
+            font-weight: 600;
+            color: #444;
+            /* बॉक्स को हल्का सा ऊपर उठाने वाला इफ़ेक्ट */
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15), 
+                       -4px -4px 8px rgba(255, 255, 255, 0.4);
             white-space: nowrap;
-        }
-
-        /* घड़ी के नंबर/निशान */
-        .mark-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-        
-        .mark {
-            position: absolute;
-            width: 1vmin;
-            height: 4vmin;
-            background-color: #222;
-            left: 50%;
-            transform: translateX(-50%);
-            top: 1vmin;
-            border-radius: 2px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <button id="fullscreen-btn">Fullscreen / फुलस्क्रीन</button>
+    <button id="fullscreen-btn">Toggle Fullscreen</button>
 
-    <div class="clock" id="clock">
-        <div id="date-display" class="date-display"></div>
-        
-        <div class="hand hour" id="hour"></div>
-        <div class="hand minute" id="minute"></div>
-        <div class="hand second" id="second"></div>
+    <div class="clock-ring">
+        <div class="clock-inner" id="clock">
+            <div id="date-display" class="date-display"></div>
+            
+            <div class="hand hour" id="hour"></div>
+            <div class="hand minute" id="minute"></div>
+            <div class="hand second" id="second"></div>
+        </div>
     </div>
 
     <script>
-        // 1. घड़ी के 12 निशान (Marks) बनाने का कोड
-        const clock = document.getElementById('clock');
-        for (let i = 0; i < 12; i++) {
-            let markContainer = document.createElement('div');
-            markContainer.className = 'mark-container';
-            markContainer.style.transform = `rotate(${i * 30}deg)`; // हर निशान 30 डिग्री पर
+        // 1. घड़ी में 1 से 12 तक के नंबर सेट करना
+        const clockInner = document.getElementById('clock');
+        for (let i = 1; i <= 12; i++) {
+            let numContainer = document.createElement('div');
+            numContainer.className = 'number';
+            numContainer.style.transform = `rotate(${i * 30}deg)`; 
             
-            let mark = document.createElement('div');
-            mark.className = 'mark';
-            
-            // 12, 3, 6, 9 को थोड़ा बड़ा दिखाने के लिए
-            if (i % 3 === 0) {
-                mark.style.height = '6vmin';
-                mark.style.width = '1.5vmin';
-            }
+            let numText = document.createElement('div');
+            numText.innerText = i;
+            // नंबरों को सीधा रखने के लिए वापस उल्टा घुमाना
+            numText.style.transform = `rotate(-${i * 30}deg)`; 
 
-            markContainer.appendChild(mark);
-            clock.appendChild(markContainer);
+            numContainer.appendChild(numText);
+            clockInner.appendChild(numContainer);
         }
 
-        // 2. घड़ी को चलाने का कोड (समय और कांटे सेट करना)
+        // 2. घड़ी के कांटे और तारीख का लॉजिक
         const hourHand = document.getElementById('hour');
         const minuteHand = document.getElementById('minute');
         const secondHand = document.getElementById('second');
@@ -186,28 +207,25 @@
         function setClock() {
             const currentDate = new Date();
             
-            // समय का अनुपात (Ratio) निकालना
             const secondsRatio = currentDate.getSeconds() / 60;
             const minutesRatio = (secondsRatio + currentDate.getMinutes()) / 60;
             const hoursRatio = (minutesRatio + currentDate.getHours()) / 12;
 
-            // कांटों को घुमाना (Rotate)
             setRotation(secondHand, secondsRatio);
             setRotation(minuteHand, minutesRatio);
             setRotation(hourHand, hoursRatio);
 
-            // दिन और तारीख सेट करना (हिंदी/अंग्रेजी मिक्स फॉर्मेट में)
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            dateDisplay.innerText = currentDate.toLocaleDateString('hi-IN', options);
+            // दिन और तारीख अंग्रेजी में (Small format)
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
+            dateDisplay.innerText = currentDate.toLocaleDateString('en-US', options);
         }
 
         function setRotation(element, rotationRatio) {
             element.style.transform = `rotate(${rotationRatio * 360}deg)`;
         }
 
-        // हर 1 सेकंड (1000ms) में समय अपडेट करें
         setInterval(setClock, 1000);
-        setClock(); // पेज लोड होते ही समय दिखाएं
+        setClock();
 
         // 3. फुलस्क्रीन बटन का लॉजिक
         const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -215,17 +233,18 @@
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
-                    alert(`फुलस्क्रीन करने में समस्या आई: ${err.message}`);
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
                 });
+            } else {
+                document.exitFullscreen();
             }
         });
 
-        // जैसे ही फुलस्क्रीन चालू या बंद हो, बटन को गायब या वापस लाएं
         document.addEventListener('fullscreenchange', () => {
             if (document.fullscreenElement) {
-                fullscreenBtn.style.display = 'none'; // फुलस्क्रीन में बटन गायब
+                fullscreenBtn.style.display = 'none';
             } else {
-                fullscreenBtn.style.display = 'block'; // फुलस्क्रीन से बाहर आने पर वापस
+                fullscreenBtn.style.display = 'block';
             }
         });
     </script>
